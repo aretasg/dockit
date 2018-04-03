@@ -12,7 +12,7 @@ Have MGLTools 1.5.6 installed. If you are using Linux or Windows machine please 
 
 * Determine the search box size and centre positioning using Chimera or AutoDock Tools;
 * Place the protein PDB and ligand PDB inside enzymes/PDB and ligands/PDB folders, respectively;
-* Then in the while in the same directory as dockit-vina.sh execute a command:
+* While in the same directory as dockit-vina.sh file execute a command with search box parameters as arguments:
 ```
 bash dockit-vina.sh -xc 45 -yc 50 -zc 50 -xs 20 -ys 20 -zs 16
 ```

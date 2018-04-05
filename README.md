@@ -16,15 +16,15 @@ Have MGLTools 1.5.6 installed. If you are using Linux or Windows machine please 
 ```
 bash dockit-vina.sh -xc 45 -yc 50 -zc 50 -xs 20 -ys 20 -zs 16
 ```
-* The calculation will take some time depending on the parameters choosen; you can find your results in the results folder and view progress in percentage by opening vina file.
+* The calculation will take some time depending on the parameters chosen; you can find your results in the results folder and view progress in percentage by opening vina file.
 * To view the results just load the protein and the .pdbqt file in the results folder with a viewer of your choice.
 
 ### FAQ and limitations
 
-* energy minimisation of the ligand before docking for more accurate representation of the bond lengths and angles using AmberTools is currently integradted in dockit_vina.sh but you need AmberTools and $AMBERHOME set for it to work;
+* energy minimisation of the ligand before docking for more accurate representation of the bond lengths and angles using AmberTools is currently integrated in dockit_vina.sh but you need AmberTools and $AMBERHOME set for it to work;
 * to modify seed, exhaustiveness and num_mode parameters to be run with Vina edit the default values in bin/prepare_vina_config.py.
-* As of now Dockit-Vina does not support flexibile residues and target proteins are treated as rigid structures;
-* The neccesity of selecting the right charges (Kollman/Gasteirger) is absolete when using Vina due to it's scoring system being based hydrophobic and hydrogen bond interactions in contrast to its predecessor AutoDock 4;
+* As of now Dockit-Vina does not support flexible residues and target proteins are treated as rigid structures. However, it can be done in a rather not user friendly manner by placing flexible residues in PDBQT file and appending dock.py command in dockit_vina.sh with --flex argument;
+* The necessity of selecting the right charges (Kollman/Gasteirger) is absolete when using Vina due to it's scoring system being based hydrophobic and hydrogen bond interactions in contrast to its predecessor AutoDock 4;
 
 ## Authors
 * **Aretas Gaspariunas**

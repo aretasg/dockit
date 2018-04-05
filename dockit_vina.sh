@@ -7,11 +7,12 @@ while test $# -gt 0; do
                         echo " "
                         echo "Dockit-Vina"
                         echo "Description: Dockit-Vina is a an AutoDock Vina bash/Python wrapper
-for faster docking procedure and more user-friendly experience.
+for faster docking procedure and more user-friendly experience (github.com/aretas2/dockit-vina).
 * Have MGLTools 1.5.6 installed. If you are using Linux or Windows machine
-please replace pyhtonsh in bin folder with the one in MGLToold bin bolder.
-macOS users with default directory used for MGLTools installation move to
+please replace pyhtonsh in bin folder with the one in MGLTools bin bolder.
+macOS users with default directory used for MGLTools installation can move to the
 next step.
+* Have either Python 2.7 or 3.6.
 * To use Dockit-Vina you will need to place your protein(s) molecule
 inside enzymes/PDB directory and ligand(s) molecules in ligands/PDB
 directory;
@@ -20,14 +21,12 @@ directory;
                         echo " "
                         echo "options:"
                         echo "-h, --help                show brief help"
-                        echo "  ***OPTIONAL POSITIONAL ARGUMENTS WITH WITH NO FLAG SPECIFIERS***"
                         echo "-xc x center position of the search box; default=45."
                         echo "-yc y center position of the search box; default=50."
                         echo "-zc z center position of the search box; default=50."
                         echo "-xs x size of the search box; default=20."
                         echo "-ys y size of the search box; default=20."
                         echo "-zs z size of the search box; default=16."
-                        echo "-p specify version of python to be used; default=python."
                         exit 0
                         ;;
                 -xc)
@@ -140,7 +139,7 @@ if [ -d "$AMBERHOME" ]; then
     echo "Performing energy minimisation using Amber!"
     cd ligands/PDB
     for f in *.pdb; do
-        python ../../bin/EMM.py -pdb $f
+        python ../../bin/emm.py -pdb $f
         rm -r ANTECHAMBER*
         rm -r ATOMTYPE.INF
         rm -r leap.log
@@ -172,7 +171,7 @@ done
 mkdir -p ../enzymes/PDBQT
 cd ../enzymes
 for f in ./PDB/*.pdb; do
-    ../bin/pythonsh ../bin/prepare_receptor4.py -r $f -A checkhydrogens -U nphs-v
+    ../bin/pythonsh ../bin/prepare_receptor4.py -r $f -A checkhydrogens -U nphs -v
 done
 
 # moving pdbqt to a folder

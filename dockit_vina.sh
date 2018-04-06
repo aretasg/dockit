@@ -135,21 +135,25 @@ fi
 
 # performing energy minimisation
 mkdir -p ligands/PDB
+cd ligands/PDB
 if [ -d "$AMBERHOME" ]; then
     echo "Performing energy minimisation using Amber!"
-    cd ligands/PDB
     for f in *.pdb; do
-        python ../../bin/emm.py -pdb $f
-        rm -r ANTECHAMBER*
-        rm -r ATOMTYPE.INF
-        rm -r leap.log
-        rm -r mdinfo
-        rm -r NEWPDB.PDB
-        rm -r PREP.INF
-        id=$(echo "$f" | awk -F'[.]' '{print $1}')
-        mv ./$id/$id"_min.pdb" .
-        rm -rf $id
-        rm -r $f
+        if [[ ${f: -8} == "_min.pdb" ]]; then
+            echo "The ligand $f seems to be already minimized. Skipping!"
+        else
+            python ../../bin/emm.py -pdb $f
+            rm -r ANTECHAMBER*
+            rm -r ATOMTYPE.INF
+            rm -r leap.log
+            rm -r mdinfo
+            rm -r NEWPDB.PDB
+            rm -r PREP.INF
+            id=$(echo "$f" | awk -F'[.]' '{print $1}')
+            mv ./$id/$id"_min.pdb" .
+            rm -rf $id
+            rm -r $f
+        fi
     done
 else
     echo "Failed to detect Amber directory. Please set AMBERHOME dir if you want ligand(s) to be energy minimized e.g. source /Users/username/amber17/amber.sh"

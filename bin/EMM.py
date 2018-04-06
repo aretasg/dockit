@@ -4,11 +4,11 @@
 @author: Aretas
 """
 
-### Performs energy minimisation (EMM) on a ligand PDB file using AmberTools16.
+### Performs energy minimisation (emm) on a ligand PDB file using AmberTools.
 ### You need to have AmberTools16 or 17 installed for the script to work
 ### Works with default settings
-### Outputs a folder in the PDB input directory with all EMM related files
-### $AMBERHOME path must be set for the amber16 directory
+### Outputs a folder in the PDB input directory with all emm related files
+### $AMBERHOME path must be set for the amber directory
 ### export AMBERHOME=/home/myname/amber16
 
 import os

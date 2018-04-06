@@ -4,8 +4,8 @@
 @author: Aretas
 """
 
-# creates a config files(s) for vina; accepts enzyme PDBQT as input
-# accepts and xyz coordinate and xyz box size as input
+# creates a config files(s) for vina runs; accepts enzyme PDBQT as input
+# accepts and xyz coordinate and xyz box size as arguments
 # lo1 flag is for specifting folder directory with the ligand PDBQT library
 # Please use with enyzme library as PWD for config file to be dumped accordingly
 
@@ -29,9 +29,9 @@ parser.add_argument('-ys', '--y_size',
 parser.add_argument('-zs', '--z_size',
     help='choose the z size', default=16)
 parser.add_argument('-lo', '--location',
-    help='choose the folder to save the file to', required=True)
+    help='choose the directory to save the file to', required=True)
 parser.add_argument('-lo1', '--location1',
-    help='choose the folder of the ligand PDBQT library', default="Linear_structures/PDBQT_EMM")
+    help='choose the directory of the ligand PDBQT files', default="ligands/PDBQT")
 
 parser.add_argument('-m', '--num_modes',
     help='choose num_modes', default=15)

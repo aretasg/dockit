@@ -99,27 +99,27 @@ directory;
 done
 
 if [ -z "$XC" ]; then
-    echo "XC argument missing"
+    echo "x center argument missing"
     exit 1
 fi
 if [ -z "$YC" ]; then
-    echo "YC argument missing"
+    echo "y center argument missing"
     exit 1
 fi
 if [ -z "$ZC" ]; then
-    echo "ZC argument missing"
+    echo "z center argument missing"
     exit 1
 fi
 if [ -z "$XS" ]; then
-    echo "XS argument missing"
+    echo "x size argument missing"
     exit 1
 fi
 if [ -z "$YS" ]; then
-    echo "YS argument missing"
+    echo "y size argument missing"
     exit 1
 fi
 if [ -z "$ZS" ]; then
-    echo "ZS argument missing"
+    echo "z size argument missing"
     exit 1
 fi
 

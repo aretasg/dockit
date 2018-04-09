@@ -6,7 +6,7 @@ A Python/bash wrapped CLI tool to perform high-throughput molecular docking usin
 
 ### Dependecies & Installation
 
-Have MGLTools 1.5.6 installed. If you are using Linux or Windows machine please replace pyhtonsh in bin folder with the one in the MGLTools bin bolder. macOS users with default directory used for MGLTools installation can keep the original pythonsh.
+Have MGLTools 1.5.6 installed. If you are using Linux or Windows machine please replace pyhtonsh in the bin folder with the one in the MGLTools bin bolder. macOS users with default directory used for MGLTools installation can keep the original pythonsh.
 
 ### Example usage:
 
@@ -23,9 +23,9 @@ bash dockit_vina.sh -xc 45 -yc 50 -zc 50 -xs 20 -ys 20 -zs 16
 ### FAQ and limitations
 
 * energy minimisation of the ligand before docking for more accurate representation of the bond lengths and angles using AmberTools is integrated in dockit_vina.sh but you will need AmberTools and $AMBERHOME set for it to work;
-* to modify seed, exhaustiveness and num_mode parameters to be run with Vina edit the default values in bin/prepare_vina_config.py.
+* to modify seed, exhaustiveness and num_mode parameters to be run with Vina edit the default values in bin/prepare_vina_config.py;
 * As of now Dockit-Vina does not support flexible residues and target proteins are treated as rigid structures. However, it can be done in a rather not user friendly manner by placing flexible residues in PDBQT file and appending dock.py command in dockit_vina.sh with --flex argument;
-* The necessity of selecting the right charges (Kollman/Gasteirger) is absolete when using Vina due to it's scoring system being based hydrophobic and hydrogen bond interactions in contrast to its predecessor AutoDock 4;
+* The necessity of selecting the right charges (Kollman/Gasteirger) is absolete when using Vina due to it's scoring system being based hydrophobic and hydrogen bond interactions in contrast to its predecessor AutoDock 4.
 
 ## Authors
 * **Aretas Gaspariunas**

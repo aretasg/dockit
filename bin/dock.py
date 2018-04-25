@@ -8,6 +8,7 @@
 import argparse
 import os
 import re
+import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--vina_config_file',
@@ -19,9 +20,14 @@ args = parser.parse_args()
 m_obj = re.search(r'config_vina_(.*).txt', args.vina_config_file)
 if m_obj:
     protein_ligand = m_obj.groups()[0]
-    print ("Docking {0} with AutoDock Vina.".format(protein_ligand))
+    protein_ligand_split = protein_ligand.split("-")
+    print ("Docking {0} and {1} with AutoDock Vina.".format(
+        protein_ligand_split[0], protein_ligand_split[1]))
 
-config_dir = os.path.dirname(os.path.abspath(args.vina_config_file))
-command1 = args.vina_location + " --config {0} > {1}_vina_out.txt".format(
-    args.vina_config_file, os.path.join(config_dir, protein_ligand))
-os.system(command1)
+    config_dir = os.path.dirname(os.path.abspath(args.vina_config_file))
+    command1 = args.vina_location + " --config {0} > {1}_vina_out.txt".format(
+        args.vina_config_file, os.path.join(config_dir, protein_ligand))
+    os.system(command1)
+
+else:
+    sys.exit("Failed to find a configuration file!")

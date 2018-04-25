@@ -65,17 +65,17 @@ if not os.path.exists(file_path):
     os.makedirs(file_path)
 
 for filename in os.listdir(ligand_location):
-    scaffold_number = re.search(r'(.*).pdbqt',filename)
-    if scaffold_number:
-        scaffold_name = scaffold_number.groups()[0]
+    ligand_name_search = re.search(r'(.*).pdbqt',filename)
+    if ligand_name_search:
+        ligand_name = ligand_name_search.groups()[0]
 
-        completeName = os.path.join(file_path,"config_vina_{0}_{1}.txt"
-            .format(protein_name, scaffold_name))
+        completeName = os.path.join(file_path,"config_vina_{0}-{1}.txt"
+            .format(protein_name, ligand_name))
         with open(completeName, "w") as file2:
             file2.write("receptor = {0}\n".format(pdbqt_location))
-            file2.write("ligand = {0}.pdbqt\n".format(os.path.join(ligand_location, scaffold_name)))
+            file2.write("ligand = {0}.pdbqt\n".format(os.path.join(ligand_location, ligand_name)))
             file2.write("\n")
-            file2.write("out = {0}_{1}_vina.pdbqt\n".format(os.path.join(file_path, protein_name), scaffold_name))
+            file2.write("out = {0}-{1}_vina.pdbqt\n".format(os.path.join(file_path, protein_name), ligand_name))
             file2.write("\n")
             file2.write("center_x = {0}\n".format(x_center))
             file2.write("center_y = {0}\n".format(y_center))
@@ -91,4 +91,4 @@ for filename in os.listdir(ligand_location):
             file2.write("\n")
             file2.write("seed = {0}\n".format(args.seed))
 
-print("DONE")
+print("Done writting vina configuration file!")

@@ -9,15 +9,15 @@ while test $# -gt 0; do
                         echo "Description: Dockit-Vina is a an AutoDock Vina bash/Python wrapper
 for faster docking procedure and more user-friendly experience (github.com/aretas2/dockit-vina).
 * Have MGLTools 1.5.6 installed. If you are using Linux or Windows machine
-please replace pyhtonsh in bin folder with the one in MGLTools bin bolder.
+please replace pyhtonsh in the bin folder with the one in MGLTools bin bolder.
 macOS users with default directory used for MGLTools installation can move to the
 next step.
 * Have either Python 2.7 or 3.6.
-* To use Dockit-Vina you will need to place your protein(s) molecule
-inside enzymes/PDB directory and ligand(s) molecules in ligands/PDB
+* To use Dockit-Vina you will need to place your protein molecule(s)
+inside enzymes/PDB directory and ligand molecule(s) in ligands/PDB
 directory;
 * specify the search window parameters on command line;
-* Docking results can be found in the results directory."
+* Docking results can be found in the results folder."
                         echo " "
                         echo "options:"
                         echo "-h, --help                show brief help"
@@ -133,8 +133,20 @@ fi
 # # python version to be used for scripts
 # PYTHON=${7:-python}
 
-# performing energy minimisation
+# creating ligand and enzyme directories
 mkdir -p ligands/PDB
+mkdir -p enzymes/PDB
+
+# checking if there are any ligand and enzyme files
+if [ -n "$(ls -A enzymes/PDB 2>/dev/null)" ] && [ -n "$(ls -A ligands/PDB 2>/dev/null)" ]
+then
+  echo "Found files in the enzymes and ligands folders. Proceeding."
+else
+  echo "No files enzymes and/or ligands found."
+  exit 1
+fi
+
+# performing energy minimisation using Amber
 cd ligands/PDB
 if [ -d "$AMBERHOME" ]; then
     echo "Performing energy minimisation using Amber!"
@@ -156,19 +168,25 @@ if [ -d "$AMBERHOME" ]; then
         fi
     done
 else
-    echo "Failed to detect Amber directory. Please set AMBERHOME dir if you want ligand(s) to be energy minimized e.g. source /Users/username/amber17/amber.sh"
+    echo "Failed to detect Amber directory. Please install Amber and set AMBERHOME (e.g. source /Users/username/amber17/amber.sh) directory to enable ligand energy minimization feature!"
 fi
+echo
 
 # preparing ligands
 cd .. # back to ligands dir
 for f in ./PDB/*.pdb; do
     ../bin/pythonsh ../bin/prepare_ligand4.py -l $f -A hydrogens -U nphs -v
 done
+echo
 
 # moving pdbqt to a folder
 mkdir -p ./PDBQT
 for f in ./*.pdbqt; do
     mv $f ./PDBQT
+    # replacing "-" with "_"
+    cd PDBQT
+    mv -v "$f" "$(echo $f | sed 's/-/\_/g')"
+    cd ..
 done
 
 # preparing enzymes
@@ -177,10 +195,14 @@ cd ../enzymes
 for f in ./PDB/*.pdb; do
     ../bin/pythonsh ../bin/prepare_receptor4.py -r $f -A checkhydrogens -U nphs -v
 done
+echo
 
 # moving pdbqt to a folder
 for f in ./*.pdbqt; do
     mv $f ./PDBQT
+    cd PDBQT
+    mv -v "$f" "$(echo $f | sed 's/-/\_/g')"
+    cd ..
 done
 
 # creating vina config file
@@ -189,10 +211,25 @@ cd ./PDBQT
 for f in *.pdbqt; do
     python ../../bin/prepare_vina_config.py -f $f -xc $XC -yc $YC -zc $ZC -xs $XS -ys $YS -zs $ZS -lo ../../results -lo1 ../../ligands/PDBQT
 done
+echo
 
 # running vina
-echo "Running Vina with search box parameters: Center($XC, $YC, $ZC), Size($XS, $YS, $ZS)"
+echo "Running Vina with search box parameters: Center($XC, $YC, $ZC), Size($XS, $YS, $ZS)."
 cd ../..
 for f in results/*/config*; do
     python ./bin/dock.py -i $f
 done
+echo
+
+# generating docking results .csv file
+if python -c "import pandas" &> /dev/null; then
+    echo 'pandas module found.'
+else
+    echo 'pandas module not found. Writting pandas.'
+    pip install pandas
+fi
+
+cd bin
+echo 'Writting results.'
+python get_results.py
+echo 'DONE! Thank you for using dockit-vina.'

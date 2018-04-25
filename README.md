@@ -20,7 +20,7 @@ bash dockit_vina.sh -xc 9 -yc -5 -zc 18 -xs 14 -ys 20 -zs 25
 ```
 * The calculation will take some time depending on the parameters chosen and the number of files; you can find your results in the results folder and view the progress in percentage by opening vina_out file.
 * To visualise the results just load the protein and the .pdbqt file in the results folder with a molecular viewer of your choice.
-* A csv file is generated in results folder for each enzyme quantitaive docking results.
+* A csv file with docking results is generated in results folder for each enzyme used in the docking.
 
 ### FAQ and limitations
 

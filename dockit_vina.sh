@@ -4,7 +4,7 @@
 while test $# -gt 0; do
         case "$1" in
                 -h|--help)
-                        echo " "
+                        echo
                         echo "Dockit-Vina"
                         echo "Description: Dockit-Vina is a an AutoDock Vina bash/Python wrapper
 for faster docking procedure and more user-friendly experience (github.com/aretas2/dockit-vina).
@@ -18,7 +18,7 @@ inside enzymes/PDB directory and ligand molecule(s) in ligands/PDB
 directory;
 * specify the search window parameters on command line;
 * Docking results can be found in the results folder."
-                        echo " "
+                        echo
                         echo "options:"
                         echo "-h, --help                show brief help"
                         echo "-xc x center position of the search box; default=45."
@@ -123,16 +123,6 @@ if [ -z "$ZS" ]; then
     exit 1
 fi
 
-# # input for search window size and positioning
-# XC=${1:-45} # X CENTER
-# YC=${2:-50} # Y CENTER
-# ZC=${3:-50} # Z CENTER
-# XS=${4:-20} # X SIZE
-# YS=${5:-20} # Y SIZE
-# ZS=${6:-16} # Z SIZE
-# # python version to be used for scripts
-# PYTHON=${7:-python}
-
 # creating ligand and enzyme directories
 mkdir -p ligands/PDB
 mkdir -p enzymes/PDB
@@ -226,7 +216,7 @@ if python -c "import pandas" &> /dev/null; then
     echo 'pandas module found.'
 else
     echo 'pandas module not found. Writting pandas.'
-    pip install pandas
+    python -m pip install pandas
 fi
 
 cd bin

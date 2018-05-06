@@ -8,7 +8,8 @@ A Python/bash wrapped CLI tool to perform high-throughput molecular docking usin
 
 * Have MGLTools 1.5.6 installed. If you are using Linux or Windows machine please replace pyhtonsh in the bin folder with the one in the MGLTools bin bolder. macOS users with default directory used for MGLTools installation can keep the original pythonsh;
 * To enable energy minimization feature please have AmberTools installed (http://ambermd.org/GetAmber.php) and AMBERHOME set (optional);
-* Have pandas installed.
+* If you are using Linux or Windows please download and compile vina (http://vina.scripps.edu/download.html) and replace it with the copy in the bin folder.
+* Have pandas installed (if you don't this should be installed when running the dockit_vina.sh script).
 
 ### Example usage:
 

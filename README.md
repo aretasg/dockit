@@ -28,7 +28,7 @@ bash dockit_vina.sh -xc 9 -yc -5 -zc 18 -xs 14 -ys 20 -zs 25
 * energy minimisation of the ligand before docking for more accurate representation of the bond lengths and angles using AmberTools is integrated in dockit_vina.sh but you will need AmberTools and $AMBERHOME set for it to work;
 * to modify seed, exhaustiveness and num_mode parameters to be run with Vina edit the default values in bin/prepare_vina_config.py;
 * As of now Dockit-Vina does not support flexible residues and target proteins are treated as rigid structures. However, it can be done by placing flexible residues in PDBQT file and appending dock.py command in dockit_vina.sh with --flex argument;
-* The necessity of selecting the right charges (Kollman/Gasteirger) is absolete when using Vina due to it's scoring system being based hydrophobic and hydrogen bond interactions in contrast to its predecessor AutoDock 4. Nevertheless, if you wish to use AutoDock 4 instead of Vina the default charge for enzymes and ligands are set as Kollman and Gasteirger, respectively.
+* The necessity of selecting the right charges (Kollman/Gasteirger) is absolete when using Vina due to the scoring system being based hydrophobic and hydrogen bond interactions in contrast to its predecessor AutoDock 4. Nevertheless, if you wish to use AutoDock 4 instead of Vina the default charge for enzymes and ligands are set as Kollman and Gasteirger, respectively.
 
 ## Authors
 * **Aretas Gaspariunas**

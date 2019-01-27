@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 @author: Aretas
 """
@@ -9,7 +9,7 @@
 ### Works with default settings
 ### Outputs a folder in the PDB input directory with all emm related files
 ### $AMBERHOME path must be set for the amber directory
-### export AMBERHOME=/home/myname/amber16
+### export AMBERHOME=/home/myname/amber18
 
 import os
 import re
@@ -63,7 +63,7 @@ os.system(command1)
 frcmod_filename = pdb_id + ".frcmod"
 command2 = "{2} -i {0} -f prepi -o {1}".format(
     os.path.join(file_path,prepi_filename), os.path.join(file_path,frcmod_filename),
-    os.path.join(amberhome, 'bin', 'parmchk'))
+    os.path.join(amberhome, 'bin', 'parmchk2'))
 
 os.system(command2)
 

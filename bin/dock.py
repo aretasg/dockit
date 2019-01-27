@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 @author: Aretas
 """
 
 # Accepts vina config file and location of vina as input
+
 import argparse
 import os
 import re
@@ -21,7 +22,7 @@ m_obj = re.search(r'config_vina_(.*).txt', args.vina_config_file)
 if m_obj:
     protein_ligand = m_obj.groups()[0]
     protein_ligand_split = protein_ligand.split("-")
-    print ("Docking {0} and {1} with AutoDock Vina.".format(
+    print ('Docking {0} and {1} with AutoDock Vina.'.format(
         protein_ligand_split[0], protein_ligand_split[1]))
 
     config_dir = os.path.dirname(os.path.abspath(args.vina_config_file))
@@ -30,4 +31,5 @@ if m_obj:
     os.system(command1)
 
 else:
-    sys.exit("Failed to find a configuration file!")
+    print('Failed to find a configuration file!')
+    sys.exit()

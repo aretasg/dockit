@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 @author: Aretas
 """
@@ -41,6 +41,7 @@ parser.add_argument('-s', '--seed',
     help='choose seed value', default=41436)
 
 args = parser.parse_args()
+
 x_center = float(args.x_center)
 y_center = float(args.y_center)
 z_center = float(args.z_center)
@@ -91,4 +92,4 @@ for filename in os.listdir(ligand_location):
             file2.write("\n")
             file2.write("seed = {0}\n".format(args.seed))
 
-print("Done writting vina configuration file!")
+print('Done writting Vina configuration file!')

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# creating ligand and proteins directories
+mkdir -p ligands/PDB
+mkdir -p proteins/PDB
+
 # help and usage information
 while test $# -gt 0; do
         case "$1" in
@@ -14,7 +18,7 @@ macOS users with default directory used for MGLTools installation can move to th
 next step.
 * Have either Python 2.7 or 3.6.
 * To use Dockit-Vina you will need to place your protein molecule(s)
-inside enzymes/PDB directory and ligand molecule(s) in ligands/PDB
+inside proteins/PDB directory and ligand molecule(s) in ligands/PDB
 directory;
 * specify the search window parameters on command line;
 * Docking results can be found in the results folder."
@@ -123,16 +127,12 @@ if [ -z "$ZS" ]; then
     exit 1
 fi
 
-# creating ligand and enzyme directories
-mkdir -p ligands/PDB
-mkdir -p enzymes/PDB
-
-# checking if there are any ligand and enzyme files
-if [ -n "$(ls -A enzymes/PDB 2>/dev/null)" ] && [ -n "$(ls -A ligands/PDB 2>/dev/null)" ]
+# checking if there are any ligand and proteins files
+if [ -n "$(ls -A proteins/PDB 2>/dev/null)" ] && [ -n "$(ls -A ligands/PDB 2>/dev/null)" ]
 then
-  echo "Found files in the enzymes and ligands folders. Proceeding."
+  echo "Found files in the proteins and ligands folders. Proceeding."
 else
-  echo "No files enzymes and/or ligands found."
+  echo "No files proteins and/or ligands found."
   exit 1
 fi
 
@@ -158,7 +158,7 @@ if [ -d "$AMBERHOME" ]; then
         fi
     done
 else
-    echo "Failed to detect Amber directory. Please install Amber and set AMBERHOME (e.g. source /Users/username/amber17/amber.sh) directory to enable ligand energy minimization feature!"
+    echo "Failed to detect Amber directory. Please install Amber and set AMBERHOME (e.g. source /Users/username/amber18/amber.sh) directory to enable ligand energy minimization feature!"
 fi
 echo
 
@@ -179,9 +179,9 @@ for f in ./*.pdbqt; do
     cd ..
 done
 
-# preparing enzymes
-mkdir -p ../enzymes/PDBQT
-cd ../enzymes
+# preparing proteins
+mkdir -p ../proteins/PDBQT
+cd ../proteins
 for f in ./PDB/*.pdb; do
     ../bin/pythonsh ../bin/prepare_receptor4.py -r $f -A checkhydrogens -U nphs -v
 done
@@ -215,7 +215,7 @@ echo
 if python -c "import pandas" &> /dev/null; then
     echo 'pandas module found.'
 else
-    echo 'pandas module not found. Writting pandas.'
+    echo 'pandas module not found. Installing pandas.'
     python -m pip install pandas
 fi
 

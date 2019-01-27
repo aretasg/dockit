@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 """
 @author: Aretas
 """
@@ -23,7 +23,8 @@ for subdir, dirs, files in os.walk(DATA_PATH):
             if m_obj:
                 protein_ligand = m_obj.groups()[0].split('-')
             else:
-                sys.exit("Failed to find PDBQT results files.")
+                print('Failed to find PDBQT results files.')
+                sys.exit()
 
             with open (os.path.join(subdir, file)) as pdbqt_file:
                 results = {}
@@ -56,4 +57,4 @@ for key, value in docking_data.items():
     df = df.transpose().round(3)
     df = df[['affinity_mean', 'affinity_SD', 'rmsd_l.b._mean', 'rmsd_l.b._SD',
          'rmsd_u.b._mean', 'rmsd_u.b._SD', 'modes']]
-    df.to_csv(os.path.join(DATA_PATH,'{0}_results.csv'.format(key)))
+    df.to_csv(os.path.join(DATA_PATH,'{0}_results_summary.csv'.format(key)))

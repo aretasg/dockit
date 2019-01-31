@@ -1,0 +1,11 @@
+x_center = 7.57
+y_center = -7.9
+z_center = 17.95
+x_size = 13.68
+y_size = 14.08
+z_size = 16.85
+exhaustiveness = 15
+num_modes = 15
+seed = 41436
+cpu = 1
+energy_range = 3

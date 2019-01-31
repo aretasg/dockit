@@ -7,7 +7,7 @@
 # creates a config files(s) for vina runs; accepts enzyme PDBQT as input
 # accepts and xyz coordinate and xyz box size as arguments
 # lo1 flag is for specifting folder directory with the ligand PDBQT library
-# Please use with enyzme library as PWD for config file to be dumped accordingly
+# Please use with protein library as PWD for config file to be dumped accordingly
 
 import os
 import re

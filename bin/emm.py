@@ -39,6 +39,7 @@ parser.add_argument('-ntr', '--ntr',
 
 args = parser.parse_args()
 file_name = str(args.pdb_file)
+path = os.path.abspath(__file__)
 amberhome = "$AMBERHOME"
 
 m_obj = re.search(r'(.*).pdb', file_name)

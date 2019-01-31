@@ -145,7 +145,7 @@ if [ -d "$AMBERHOME" ]; then
             echo "The ligand $f seems to be already minimized. Skipping!"
         else
             python ../../bin/emm.py -pdb $f
-            rm -r ANTECHAMBER*
+            # rm -r ANTECHAMBER*
             rm -r ATOMTYPE.INF
             rm -r leap.log
             rm -r mdinfo
@@ -211,7 +211,7 @@ for f in results/*/config*; do
 done
 echo
 
-# generating docking results .csv file
+# generating docking results summary .csv file
 if python -c "import pandas" &> /dev/null; then
     echo 'pandas module found.'
 else

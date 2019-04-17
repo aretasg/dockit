@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-"""
-@author: Aretas
-"""
-
 # creates a config files(s) for vina runs; accepts enzyme PDBQT as input
 # accepts and xyz coordinate and xyz box size as arguments
 # lo1 flag is for specifting folder directory with the ligand PDBQT library

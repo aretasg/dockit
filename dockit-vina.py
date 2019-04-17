@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 
-"""
-@author: Aretas
-"""
-
 import os
 import sys
-import subprocess
 import argparse
+from emm import run_emm
 
 # CLI argument parser
 parser = argparse.ArgumentParser(
@@ -27,6 +23,7 @@ optional.add_argument('-v', '--verbose',
     action='store_false')
 args = parser.parse_args()
 
+# checking if $VINAHOME is set
 # setting path to parameter folder
 path = os.path.abspath(__file__)
 root_dir, file = os.path.split(path)
@@ -39,7 +36,7 @@ ligands_dir = os.path.join(root_dir, 'ligands', 'PDB')
 if not os.path.exists(ligands_dir):
     os.makedirs(ligands_dir)
 
-proteins_dir = os.path.join(root_dir, 'proteins', 'PDB')
+proteins_dir = os.path.join(root_dir, 'targets', 'PDB')
 if not os.path.exists(proteins_dir):
     os.makedirs(proteins_dir)
 
@@ -72,37 +69,21 @@ if len([protein for protein in os.listdir(proteins_dir) if protein.lower().endsw
     print('Failed to find PDB files in {0} direcotry'.format(proteins_dir))
     sys.exit()
 
-if len([ligand for ligand in os.listdir(proteins_dir) if ligand.lower().endswith('.pdb')]) == 0:
+if len([ligand for ligand in os.listdir(ligands_dir) if ligand.lower().endswith('.pdb')]) == 0:
     print('Failed to find PDB files in {0} direcotry'.format(ligands_dir))
     sys.exit()
 
-# performing energy minimisation using Amber
+# performing ligand energy minimisation using Ambertools; converting to PDBQT
 if sys.platform == 'win32':
     print('Energy minimization of molecules in not supported on Windows. Skipping.')
-elif os.environ['AMBERHOME']:
-    for ligand in os.listdir(ligands_dir):
-        if ligand.lower().endswith('_min.pdb'):
-            print('{0} seems to be already minimized. Skipping!'.format(ligand))
-            continue
-        elif not ligand.startswith('.'):
-            output = subprocess.check_output('python {0} -pdb {1}'.format(
-                os.path.join(root_dir, 'bin', 'emm.py'), os.path.join(ligands_dir, ligand)), shell=True)
-
-            # removing files from the minimization run
-            remove_list = ['ATOMTYPE.INF', 'leap.log', 'mdinfo', 'NEWPDB.PDB',
-                'PREP.INF', 'min.i']
-            for file in remove_list:
-                os.remove(file)
-
-            for file in os.listdir(root_dir):
-                if file.startswith('ANTECHAMBER'):
-                    os.remove(file)
-
-            # remove folder (rework emm.py script paths)
-
-            if args.verbose is True:
-                print(output.decode('utf-8'))
-        else:
-            pass
 else:
-    print('Please set AMBERHOME path variable to enable energy minimization feature. Skipping.')
+    for ligand in os.listdir(ligands_dir):
+        emm.run_emm(os.path.abspath(ligand))
+
+# converting targets to PDBQT
+
+# generating vina config
+
+# performing docking
+
+# extracting results

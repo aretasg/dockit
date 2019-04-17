@@ -42,3 +42,4 @@ prepare_ligand4.py, prepare_receptor4.py, and pythonsh are distributed as part o
 todo:
 create protein:cords file reader to support more than one different search box specifications per run
 flex residue support
+do not distribute with vina instead us $VINA_HOME

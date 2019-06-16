@@ -7,7 +7,7 @@ import sys
 def run_emm(pdb_path, imin=1, maxcyc=1000, ncyc=500, ntpr=50, cut=999, igb=0, ntb=0):
 
     amberhome = '$AMBERHOME'
-    path = os.path.abspath(__file__)
+    # path = os.path.abspath(__file__)
     input_path, filename = os.path.split(os.path.abspath(pdb_path))
     pdb_id = filename.rstrip('.pdb').rstrip('.PDB')
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         Performs energy minimization on a small ligand PDB file using AmberTools.\n
         * AmberTools must be installed for the script to work (intended to be used with Ambertools 18);\n
         * Works with default settings;\n
-        * Replaces input file with minimized version. If you want to keep original make a copy.\n
+        * Replaces input file with minimized version. Make a copy if you want to keep the original ligand PDB file.\n
         * $AMBERHOME path must be set for the amber directory e.g.
             'export AMBERHOME=/home/myname/amber18'
     ''',epilog='Example usage: "emm.py -pdb foo.pdb"')

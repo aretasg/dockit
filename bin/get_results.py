@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-"""
-@author: Aretas
-"""
-
 import os
 import statistics
 import re

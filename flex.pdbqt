@@ -1,0 +1,20 @@
+BEGIN_RES PHE A 470
+REMARK  2 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: CA   and  CB  
+REMARK    2  A    between atoms: CB   and  CG  
+ROOT
+ATOM      1  CA  PHE A 470       8.020  -0.878  18.281  1.00 47.05     0.214 C 
+ENDROOT
+BRANCH   1   2
+ATOM      2  CB  PHE A 470       8.406   0.477  17.678  1.00 47.41     0.038 C 
+BRANCH   2   3
+ATOM      3  CG  PHE A 470       8.838   0.393  16.243  1.00 48.88     0.011 A 
+ATOM      4  CD2 PHE A 470       8.038   0.903  15.226  1.00 49.34    -0.011 A 
+ATOM      5  CE2 PHE A 470       8.435   0.817  13.896  1.00 50.19     0.004 A 
+ATOM      6  CZ  PHE A 470       9.643   0.214  13.570  1.00 50.33    -0.003 A 
+ATOM      7  CE1 PHE A 470      10.452  -0.298  14.578  1.00 51.59     0.004 A 
+ATOM      8  CD1 PHE A 470      10.047  -0.209  15.906  1.00 51.61    -0.011 A 
+ENDBRANCH   2   3
+ENDBRANCH   1   2
+END_RES PHE A 470

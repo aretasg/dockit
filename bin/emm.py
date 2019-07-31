@@ -3,8 +3,14 @@
 import argparse
 import os
 import sys
+import subprocess
 
-def run_emm(pdb_path, imin=1, maxcyc=1000, ncyc=500, ntpr=50, cut=999, igb=0, ntb=0):
+def run_emm(pdb_path, imin=1, maxcyc=1000, ncyc=500, ntpr=50, cut=999, igb=0, ntb=0, verbose=False):
+
+    if verbose is False:
+        stdout = subprocess.DEVNULL
+    else:
+        stdout = None
 
     amberhome = '$AMBERHOME'
     # path = os.path.abspath(__file__)
@@ -23,7 +29,7 @@ def run_emm(pdb_path, imin=1, maxcyc=1000, ncyc=500, ntpr=50, cut=999, igb=0, nt
         os.path.abspath(pdb_path),
         os.path.join(result_dir, prepi_filename))
 
-    os.system(prepi_command)
+    subprocess.Popen(prepi_command, shell=True, stdout=stdout).wait()
     # sys.exit()
 
     # running parmchk
@@ -33,7 +39,7 @@ def run_emm(pdb_path, imin=1, maxcyc=1000, ncyc=500, ntpr=50, cut=999, igb=0, nt
         os.path.join(result_dir, prepi_filename),
         os.path.join(result_dir, frcmod_filename))
 
-    os.system(frcmod_command)
+    subprocess.Popen(frcmod_command, shell=True, stdout=stdout).wait()
 
     # running tleap
     model_prep_path = os.path.join(result_dir,"model_prep")
@@ -49,7 +55,7 @@ def run_emm(pdb_path, imin=1, maxcyc=1000, ncyc=500, ntpr=50, cut=999, igb=0, nt
     tleap_command = '{0} -f {1}'.format(os.path.join(amberhome, 'bin', 'tleap'),
         model_prep_path)
 
-    os.system(tleap_command)
+    subprocess.Popen(tleap_command, shell=True, stdout=stdout).wait()
 
     # creates min.i file in the input directory
     mini_path = os.path.join(result_dir, 'min.i')
@@ -64,7 +70,7 @@ def run_emm(pdb_path, imin=1, maxcyc=1000, ncyc=500, ntpr=50, cut=999, igb=0, nt
         '{2}.inpcrd -r {2}_min.rst'.format(os.path.join(amberhome, 'bin', 'sander'),
             mini_path, os.path.join(result_dir, pdb_id)))
 
-    os.system(mini_command)
+    subprocess.Popen(mini_command, shell=True, stdout=stdout).wait()
 
     # conversion to PDB format
     ptraj_path = os.path.join(result_dir, 'rst2pdb.ptraj')
@@ -76,7 +82,7 @@ def run_emm(pdb_path, imin=1, maxcyc=1000, ncyc=500, ntpr=50, cut=999, igb=0, nt
     ptraj_command = '{0} -i {1}'.format(os.path.join(amberhome, 'bin', 'cpptraj'),
         ptraj_path)
 
-    os.system(ptraj_command)
+    subprocess.Popen(ptraj_command, shell=True, stdout=stdout).wait()
 
     # removing files run files
     for filename in os.listdir(result_dir):
@@ -155,4 +161,4 @@ if __name__ == "__main__":
             sys.exit()
 
     run_emm(args.pdb_file, args.imin, args.maxcyc, args.ncyc, args.ntpr,
-        args.cut, args.igb, args.ntb)
+        args.cut, args.igb, args.ntb, verbose=True)

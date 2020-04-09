@@ -1,45 +1,50 @@
-# Dockit-Vina
+# Dockit
 
-A Python/bash wrapped CLI tool to perform high-throughput molecular docking using AutoDock Vina.
+Python CLI tool to perform high-throughput molecular docking using AutoDock Vina
 
-## Getting Started
+## Features
+* Molecular docking using multiple target and ligands
+* Use other Vina-like engines
+* Flexible residue declaration for targets
+* Energy minimization using obminimize to generate more realistic ligand conformations
+* Generates a csv file will all docking results for all modes for easy access to data
+* Uses original PDBQT preparation method to take advantage of calibration with the Vina scoring system
 
-### Dependecies & Installation
-
-* Have MGLTools 1.5.6 installed. If you are using Linux or Windows machine please replace pyhtonsh in the bin folder with the one in the MGLTools bin bolder. macOS users with default directory used for MGLTools installation can keep the original pythonsh;
-* To enable energy minimization feature please have AmberTools 18 installed (http://ambermd.org/GetAmber.php) and AMBERHOME set (optional);
-* If you are using Linux or Windows please download and compile Vina (http://vina.scripps.edu/download.html) and replace it with the copy in the bin folder.
-* Have pandas installed (this should be installed when running the dockit_vina.sh script with no arguments if you have pip).
-
-### Example usage:
-
-* Determine the search box size and centre positioning using Chimera (Structure/Binding Analysis > Vina) or AutoDock Tools;
-* Copy the protein PDB and ligand PDB inside proteins/PDB and ligands/PDB folders, respectively. You can create the folders manually or by running the dockit_vina.sh script;
-* While in the same directory as dockit_vina.sh file execute a command with search box parameters as arguments:
+## Dependecies & Installation
+You must install [conda](https://docs.conda.io/en/latest/miniconda.html) first to set up the enviroment
 ```
-bash dockit_vina.sh -xc 9 -yc -5 -zc 18 -xs 14 -ys 20 -zs 25
+git clone https://github.com/aretasg/dockit
+cd dockit
+conda env create --file=environment.yml
+conda activate dockit
+cd app
+python dockit.py
 ```
-* The calculation will take some time depending on the parameters chosen and the number of files; you can find your results in the results folder and view the progress in percentage by opening vina_out file.
-* To visualise the results just load the protein and the ligand .pdbqt file in the results folder with a molecular viewer of your choice.
-* A csv file with docking results is generated in results folder for each enzyme used in the docking.
 
-### FAQ and limitations
+### Example usage
+1. Determine the search box size and centre positioning using Chimera (Structure/Binding Analysis > Vina) or similar
+2. Copy the protein and ligand PDB files inside proteins/PDB and ligands/PDB folders, respectively
+3. Define search box and docking parameters for each target in  ```dockit_param.csv``` and run:
+```
+python dockit.py
+```
+* The calculation will take some time depending on the parameters chosen and the number of files. Results can be found in the results folder
+* Visualise the results with a molecular viewer of your choice by loading ligand .pdbqt file in the results folder and target PDB or PDBQT file in targets directory
+* csv file ```dockit_results.csv``` with all docking results is generated in results folder
+* Run with ```-r``` flag to reset to the pre-run state - PDBQT and result files will be removed
 
-* energy minimisation of the ligand before docking for more accurate representation of the bond lengths and angles using AmberTools is integrated in dockit_vina.sh but you will need AmberTools and $AMBERHOME set for it to work;
-* to modify seed, exhaustiveness and num_mode parameters to be run with Vina edit the default values in bin/prepare_vina_config.py;
-* As of now Dockit-Vina does not support flexible residues and target proteins are treated as rigid structures. However, it can be done by placing flexible residues in PDBQT file and appending dock.py command in dockit_vina.sh with --flex argument (e.g. --config conf --receptor rigid.pdbqt --flex side_chains.pdbqt --ligand ligand.pdbqt);
-* The necessity of selecting the right charges (Kollman/Gasteirger) is absolete when using Vina due to the scoring system being based hydrophobic and hydrogen bond interactions in contrast to its predecessor AutoDock 4. Nevertheless, if you wish to use AutoDock 4 instead of Vina the default charge for enzymes and ligands are set as Kollman and Gasteirger, respectively.
+## FAQ and limitations
+* Edit ```dockit_param.csv``` to change any parameters to be run with the docking engine, including search box parameters
+* Supports declaration of flexible residues for targets. Please look at ```dockit_param.csv``` for an example for how to declare flexible residues
+* Copy prepare_flexreceptor4.py from autodocktools-prepare location to conda dockit environemnt folder to enable flexible residue selection
+* Supports other Vina-like engines. Please specify the engine or path to it in the engine column of ```dockit_param.csv```
+* The necessity of selecting the charges (Kollman/Gasteirger) is absolete with Vina due to the scoring system being based hydrophobic and hydrogen bond interactions in contrast to its predecessor AutoDock 4. Nevertheless, if you wish to use AutoDock 4 instead of Vina the default charge for enzymes and ligands are set as Kollman and Gasteirger, respectively
 
 ## Authors
-* **Aretas Gaspariunas**
+**Aretas Gaspariunas**
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ### Acknowledgments & Disclaimer
-prepare_ligand4.py, prepare_receptor4.py, and pythonsh are distributed as part of MGLTools 1.5.6 and all the ownership together with AutoDock Vina is credited to their respective authors (Morris et al., 2009).
-
-todo:
-create protein:cords file reader to support more than one different search box specifications per run
-flex residue support
-do not distribute with vina instead us $VINA_HOME
+prepare_ligand4.py, prepare_receptor4.py, and prepare_flexreceptor4.py are distributed as part of MGLTools 1.5.6 and all the ownership together with AutoDock Vina is credited to their respective authors (Morris et al., 2009)

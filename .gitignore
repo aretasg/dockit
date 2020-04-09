@@ -2,3 +2,5 @@
 ligands
 targets
 results
+app/*.logs
+app/*.pyc

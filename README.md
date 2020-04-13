@@ -3,9 +3,9 @@
 Python CLI tool to perform high-throughput molecular docking using AutoDock Vina
 
 ## Features
-* Molecular docking using multiple target and ligands
-* Use other Vina-like engines like [Qvina2](https://qvina.github.io) or [Smina](https://github.com/mwojcikowski/smina)
+* Molecular docking with multiple target and ligands at the same time
 * Flexible residue declaration support for targets
+* Use other Vina-like engines like [Qvina2](https://qvina.github.io) or [Smina](https://github.com/mwojcikowski/smina)
 * Energy minimization using [obminimize](https://openbabel.org/wiki/Obminimize) to generate more realistic ligand conformations
 * Docker support. Run it anywhere!
 * Generates a csv file with all docking results for all modes for easy access to the docking results
@@ -30,24 +30,23 @@ python app/dockit.py
 ```
 The last command will create ligands/PDB and targets/PDB directories, alternatively, they can be created manually
 
-### Example usage
+## Example usage
 1. Determine the search box size and centre positioning using [Chimera](https://www.cgl.ucsf.edu/chimera/download.html) (Structure/Binding Analysis > Vina) or similar
 2. Define search box and docking parameters for each target in ```dockit_param.csv```
 3. Copy protein and ligand PDB files into targets/PDB and ligands/PDB folders, respectively and run:
 ```
 python app/dockit.py
 ```
-or if using with docker
+or if using Docker
 ```
 docker-compose up
 ```
 * The calculation will take some time depending on the parameters chosen and the number of files. Results can be found in the results folder
 * Visualise the ```results``` with a molecular viewer of your choice by loading ligand .pdbqt file in the ```results``` folder and target PDB or PDBQT file in ```targets``` directory
-* csv file ```dockit_results.csv``` is generated in ```results``` folder with all docking results
+* csv file ```dockit_results.csv``` is generated in ```results``` folder with all the docking results
 * Run with ```-r``` flag to reset to the pre-run state - PDBQT and result files will be removed
 
 ## Argument description in dockit_param.csv
-target,x_center,y_center,z_center,x_size,y_size,z_size,exhaustiveness,num_modes,seed,cpu,energy_range,flex_resi,engine
 | Argument | Description | Required |
 | -----------: | ----------------- | :----------: |
 | `target` | file name of the target located in targets/PDB - excluding the extension | :heavy_exclamation_mark: |

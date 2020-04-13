@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# todo: silence obabel, docker
-
 import logging
 import os
 import shutil
@@ -49,7 +47,7 @@ def pdb_parser(pdb_file):
                 atom_count += 1
                 break
         if atom_count == 0:
-            logger.error('Input file does not seem to be in PDB format.')
+            print('Input file does not seem to be in PDB format.')
             return False
         else:
             return True
@@ -69,35 +67,40 @@ def parse_param_csv(param_dir):
                 param_dict[line_count] = {header[i]: row[i] for i in range(len(header))}
                 line_count += 1
 
+    for key, value in param_dict.items():
+        if key in ('target', 'x_center', 'y_center', 'z_center', 'size_x', 'size_y', 'size_z') and value == '':
+            raise ValueError('Missing one or more arguments in dockit_param.csv')
+
     return param_dict
 
 
-def vina_config(config_dir, targets_pdbqt_dir, ligands_pdbqt_dir, results_dir, ligand, row, flex_resi=None):
+def vina_config(config_dir, targets_pdbqt_dir, ligands_pdbqt_dir, results_dir, ligand, row, engine, flex_resi=None):
 
     with open(config_dir, 'w') as vina_config:
         vina_config.write("receptor = {0}\n".format(os.path.join(targets_pdbqt_dir, row['target'] + '.pdbqt')))
         if flex_resi:
             vina_config.write("flex = {0}\n".format(flex_resi))
         vina_config.write("ligand = {0}\n".format(os.path.join(ligands_pdbqt_dir, ligand)))
-        vina_config.write("\n")
         vina_config.write("out = {0}-{1}.pdbqt\n".format(
-            os.path.join(results_dir, 'res_vina_' + row['target']),
+            os.path.join(results_dir, 'res_{0}_'.format(engine) + row['target']),
             ligand)
         )
-        vina_config.write("\n")
         vina_config.write("center_x = {0}\n".format(row['x_center']))
         vina_config.write("center_y = {0}\n".format(row['y_center']))
         vina_config.write("center_z = {0}\n".format(row['z_center']))
-        vina_config.write("\n")
         vina_config.write("size_x = {0}\n".format(row['x_size']))
         vina_config.write("size_y = {0}\n".format(row['y_size']))
         vina_config.write("size_z = {0}\n".format(row['z_size']))
-        vina_config.write("\n")
-        vina_config.write("exhaustiveness = {0}\n".format(row['exhaustiveness']))
-        vina_config.write("\n")
-        vina_config.write("num_modes = {0}\n".format(row['num_modes']))
-        vina_config.write("\n")
-        vina_config.write("seed = {0}\n".format(row['seed']))
+        if row['exhaustiveness'] != '':
+            vina_config.write("exhaustiveness = {0}\n".format(row['exhaustiveness']))
+        if row['num_modes'] != '':
+            vina_config.write("num_modes = {0}\n".format(row['num_modes']))
+        if row['seed'] != '':
+            vina_config.write("seed = {0}\n".format(row['seed']))
+        if row['energy_range'] != '':
+            vina_config.write("energy_range = {0}\n".format(row['energy_range']))
+        if row['cpu'] != '':
+            vina_config.write("cpu = {0}\n".format(row['cpu']))
 
 
 def reset_(path):
@@ -178,8 +181,7 @@ def dockit(verbose, reset):
     for ligand in os.listdir(ligands_dir):
         if not ligand.lower().endswith('.pdb'):
             continue
-        subprocess.Popen('{0} -l {1} -o {2} -A hydrogens -U nphs -v'.format(
-            os.path.join('prepare_ligand4.py'),
+        subprocess.Popen('prepare_ligand4.py -l {0} -o {1} -A hydrogens -U nphs -v'.format(
             ligand,
             os.path.join(ligands_pdbqt_dir, ligand.replace('pdb', 'pdbqt').replace('.PDB', '.pdbqt'))
             ), shell=True, stdout=stdout).wait()
@@ -194,8 +196,7 @@ def dockit(verbose, reset):
     for target in os.listdir(targets_dir):
         if not target.lower().endswith('.pdb'):
             continue
-        subprocess.Popen('{0} -r {1} -o {2} -A checkhydrogens -U nphs -v'.format(
-            os.path.join('prepare_receptor4.py'),
+        subprocess.Popen('prepare_receptor4.py -r {0} -o {1} -A checkhydrogens -U nphs -v'.format(
             target,
             os.path.join(targets_pdbqt_dir, target.replace('pdb', 'pdbqt').replace('.PDB', '.pdbqt'))
             ), shell=True, stdout=stdout).wait()
@@ -209,7 +210,7 @@ def dockit(verbose, reset):
     param_dir = os.path.join(root_dir, 'dockit_param.csv')
     param_dict = parse_param_csv(param_dir)
 
-    logger.info('Creating Vina config files and initiating docking')
+    logger.info('Creating docking config files and initiating docking')
     for index, row in param_dict.items():
         for ligand in os.listdir(ligands_pdbqt_dir):
 
@@ -227,7 +228,7 @@ def dockit(verbose, reset):
                 logger.info('Creating flexible residue PDBQT')
                 try:
                     subprocess.Popen('{0} -r {1} -s {2} -g {3} -x {4} -v'.format(
-                        'prepare_flexreceptor4.py',
+                        os.path.join(app_dir, 'prepare_flexreceptor4.py'),
                         os.path.join(targets_pdbqt_dir, row['target'] + '.pdbqt'),
                         row['flex_resi'],
                         os.path.join(targets_pdbqt_dir, row['target'] + '.pdbqt'),
@@ -241,18 +242,19 @@ def dockit(verbose, reset):
                     logger.warning('Failed to assign flexible residues. Skipping')
                     flex_resi = None
 
-            config_dir = os.path.join(tar_result_dir, 'vina_config_{0}-{1}.txt'
-                .format(row['target'], ligand_name))
+            engine = os.path.split(row['engine'])[-1]
+            config_dir = os.path.join(tar_result_dir, '{0}_config_{1}-{2}.txt'
+                .format(engine, row['target'], ligand_name))
 
             logger.debug('Creating config file')
             vina_config(config_dir, targets_pdbqt_dir, ligands_pdbqt_dir,
-                tar_result_dir, ligand, row, flex_resi=flex_resi)
+                tar_result_dir, ligand, row, engine, flex_resi=flex_resi)
 
-            logger.info('Docking {0} to {1}'.format(ligand_name, row['target']))
+            logger.info('Docking {0} to {1} using {2}'.format(ligand_name, row['target'], row['engine']))
             vina_command = "{0} --config {1} > {2}.txt".format(
                 row['engine'],
                 config_dir,
-                os.path.join(tar_result_dir, "vina_out_" + row['target'] + '-' + ligand.rstrip('.pdbqt'))
+                os.path.join(tar_result_dir, engine + "_out_" + row['target'] + '-' + ligand.rstrip('.pdbqt'))
                 )
 
             subprocess.Popen(vina_command, shell=True, stdout=stdout).wait()
@@ -265,7 +267,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description='''
-        Autodock Vina wrapper for performing high-throughput molecular docking
+        AutoDock Vina wrapper for performing high-throughput molecular docking
         with multiple targets and flexible residue support
         ''',
         epilog='Usage in CLI: "python dockit.py"')
@@ -276,7 +278,7 @@ if __name__ == "__main__":
         help='Specify the flag to include verbose messages',
         action='store_true')
     optional.add_argument('-r', '--reset',
-        help='Restores input files to pre-run state; preserving only input PDB files',
+        help='Restores input files to pre-run state preserving only input PDB files',
         action='store_true')
     args = parser.parse_args()
 

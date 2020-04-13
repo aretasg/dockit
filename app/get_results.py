@@ -6,7 +6,7 @@ import sys
 import csv
 
 
-def parse_result_pdbqt(pdbqt_dir):
+def parse_result_pdbqt(pdbqt_dir, engine):
 
     with open(pdbqt_dir, 'r') as pdbqt_file:
         results = {}
@@ -14,7 +14,24 @@ def parse_result_pdbqt(pdbqt_dir):
         for line in pdbqt_file:
             if line.startswith('REMARK VINA RESULT:'):
                 affinity, lb, ub = line.split()[3:6]
-                results[mode] = {'affinity': affinity, 'lb': lb, 'ub': ub}
+                results[mode] = {'affinity': affinity, 'lb': lb, 'ub': ub, 'engine': engine}
+                mode += 1
+
+        return results
+
+
+def parse_smina_result_pdbqt(pdbqt_dir, engine):
+
+    with open(pdbqt_dir, 'r') as pdbqt_file:
+        results = {}
+        mode = 1
+        ub = None
+        for line in pdbqt_file:
+            if line.startswith('REMARK minimizedAffinity'):
+                affinity = line.split()[2]
+            elif line.startswith('REMARK minimizedRMSD'):
+                lb = line.split()[2]
+                results[mode] = {'affinity': affinity, 'lb': lb, 'ub': ub, 'engine': engine}
                 mode += 1
 
         return results
@@ -27,11 +44,14 @@ def collect_results(path):
     for subdir, dirs, files in os.walk(path):
         for file in files:
             if file.endswith('.pdbqt'):
-                m_obj = re.search(r'res_vina_(.*).pdbqt', file)
+                m_obj = re.search(r'res_(.*)_(.*).pdbqt', file)
                 if m_obj:
-                    target, ligand = m_obj.groups()[0].rstrip('.pdbqt').split('-')
-
-                results = parse_result_pdbqt(os.path.join(subdir, file))
+                    engine = m_obj.groups()[0]
+                    target, ligand = m_obj.groups()[1].split('-')
+                print(engine)
+                results = parse_result_pdbqt(os.path.join(subdir, file), engine)
+                if not results:
+                    results = parse_smina_result_pdbqt(os.path.join(subdir, file), engine)
 
                 if target not in docking_res_dict:
                     docking_res_dict[target] = {ligand: results}
@@ -45,13 +65,13 @@ def dump_csv(docking_data, results_dir):
 
     csv_dir = os.path.join(results_dir, 'dockit_results.csv')
     with open(csv_dir, mode='w') as csv_file:
-        headers = ['target', 'ligand', 'mode', 'affinity (kcal/mol)', 'rmsd l.b.', 'rmsd u.b.']
+        headers = ['target', 'ligand', 'mode', 'affinity (kcal/mol)', 'rmsd l.b.', 'rmsd u.b.', 'engine']
         writer = csv.writer(csv_file)
         writer.writerow(headers)
         for target, ligand in docking_data.items():
             for lig, result in ligand.items():
                 for mode, res in result.items():
-                    writer.writerow([target, lig, mode, res['affinity'], res['lb'], res['ub']])
+                    writer.writerow([target, lig, mode, res['affinity'], res['lb'], res['ub'], res['engine']])
 
 
 def get_results():

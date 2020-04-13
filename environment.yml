@@ -7,43 +7,10 @@ channels:
 dependencies:
   - autodock-vina=1.1.2
   - autodocktools-prepare=1.5.7
-  - blas=1.0
-  - ca-certificates=2020.4.5.1
-  - cairo=1.16.0
-  - certifi=2019.11.28
-  - fontconfig=2.13.1
-  - freetype=2.10.1
-  - gettext=0.19.8.1
-  - glib=2.58.3
-  - icu=64.2
-  - intel-openmp=2019.4
-  - libcxx=10.0.0
-  - libcxxabi=4.0.1
-  - libedit=3.1.20181209
-  - libffi=3.2.1
-  - libgfortran=3.0.1
-  - libiconv=1.15
-  - libpng=1.6.37
-  - libxml2=2.9.10
-  - mkl=2019.4
-  - mkl-service=2.3.0
-  - mkl_fft=1.0.15
-  - mkl_random=1.1.0
-  - ncurses=6.2
-  - numpy=1.16.6
-  - numpy-base=1.16.6
   - openbabel=3.0.0
-  - pcre=8.44
-  - pip=19.3.1
-  - pixman=0.38.0
   - python=2.7.17
-  - python_abi=2.7
-  - readline=7.0
-  - setuptools=44.0.0
-  - six=1.13.0
-  - sqlite=3.31.1
-  - tk=8.6.8
-  - wheel=0.33.6
-  - xz=5.2.5
-  - zlib=1.2.11
+  - qvina=2.1.0
+  - smina=2017.11.9
+
+
 

@@ -1,6 +1,8 @@
 .DS_Store
-ligands
-targets
+ligands/PDBQT
+ligands/PDB/*.pdb
+targets/PDBQT
+targets/PDB/*.pdb
 results
 app/*.logs
 app/*.pyc

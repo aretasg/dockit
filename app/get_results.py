@@ -48,7 +48,7 @@ def collect_results(path):
                 if m_obj:
                     engine = m_obj.groups()[0]
                     target, ligand = m_obj.groups()[1].split('-')
-                print(engine)
+                # print(engine)
                 results = parse_result_pdbqt(os.path.join(subdir, file), engine)
                 if not results:
                     results = parse_smina_result_pdbqt(os.path.join(subdir, file), engine)

@@ -1,3 +1,3 @@
-target,x_center,y_center,z_center,x_size,y_size,z_size,exhaustiveness,num_modes,seed,cpu,energy_range,flex_resi,engine
-exampleFLEX,7,-8,18,20,20,23,5,2,36213,1,3,exampleFLEX:A:LEU472_GLN344_VAL388_ASP469,qvina2
-example,7,-8,18,20,20,23,,3,36213,,3,,vina
+target,x_center,y_center,z_center,x_size,y_size,z_size,exhaustiveness,num_modes,seed,cpu,energy_range,flex_resi,engine,weight_hydrogen,weight_gauss1,weight_gauss2,weight_repulsion,weight_hydrophobic,weight_rot
+example,7,-8,18,20,20,23,,3,36213,2,3,,vina,,,,,,
+exampleFLEX,7,-8,18,20,20,23,5,2,36213,1,3,exampleFLEX:A:LEU472_GLN344_VAL388_ASP469,qvina2,,,,,,

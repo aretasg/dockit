@@ -21,7 +21,8 @@ class AppLogger:
         logger.setLevel(logging.DEBUG)
 
         formatter = logging.Formatter(
-            "%(asctime)s : %(levelname)s : %(name)s : %(message)s"
+            "%(asctime)s : %(levelname)s : %(name)s : %(message)s",
+            "%Y-%m-%d %H:%M:%S"
         )
 
         file_handler = logging.FileHandler(log_file)
@@ -101,6 +102,18 @@ def vina_config(config_dir, targets_pdbqt_dir, ligands_pdbqt_dir, results_dir, l
             vina_config.write("energy_range = {0}\n".format(row['energy_range']))
         if row['cpu'] != '':
             vina_config.write("cpu = {0}\n".format(row['cpu']))
+        if row['weight_hydrogen'] != '':
+            vina_config.write("weight_hydrogen = {0}\n".format(row['weight_hydrogen']))
+        if row['weight_gauss1'] != '':
+            vina_config.write("weight_gauss1 = {0}\n".format(row['weight_gauss1']))
+        if row['weight_gauss2'] != '':
+            vina_config.write("weight_gauss2 = {0}\n".format(row['weight_gauss2']))
+        if row['weight_repulsion'] != '':
+            vina_config.write("weight_repulsion = {0}\n".format(row['weight_repulsion']))
+        if row['weight_hydrophobic'] != '':
+            vina_config.write("weight_hydrophobic = {0}\n".format(row['weight_hydrophobic']))
+        if row['weight_rot'] != '':
+            vina_config.write("weight_rot = {0}\n".format(row['weight_rot']))
 
 
 def reset_(path):
@@ -113,7 +126,7 @@ def reset_(path):
         raise e
 
 
-def dockit(verbose, reset):
+def dockit(verbose, reset, minimization):
 
     path = os.path.dirname(os.path.realpath(__file__))
     logger = AppLogger.get(__name__, os.path.join(path, 'dockit.logs'),
@@ -161,27 +174,31 @@ def dockit(verbose, reset):
             logger.error('File not in PDB format {0}'.format(ligand))
             sys.exit()
 
-    logger.info('Minimizing ligands with obminimize')
     os.chdir(ligands_dir)
-    try:
-        for ligand in os.listdir(ligands_dir):
-            subprocess.Popen('obminimize {0} > min_{0}'.format(ligand),
-                shell=True, stdout=stdout).wait()
-            os.remove(ligand)
-            os.rename('min_'+ligand, ligand)
-    except Exception as e:
-        logger.error('Failed to minimize ligands')
+    if minimization is True:
+        logger.info('Minimizing ligands with obminimize')
+        try:
+            for ligand in os.listdir(ligands_dir):
+                subprocess.Popen('obminimize -o pdb {0} > min_{0}'.format(ligand),
+                    shell=True, stdout=stdout).wait()
+                os.remove(ligand)
+                os.rename('min_'+ligand, ligand)
+        except Exception as e:
+            logger.error('Failed to minimize ligands')
+    else:
+        pass
 
     logger.debug('Creating ligand PDBQT dir')
     ligands_pdbqt_dir = os.path.join(root_dir, 'ligands', 'PDBQT')
     if not os.path.exists(ligands_pdbqt_dir):
         os.makedirs(ligands_pdbqt_dir)
 
-    logger.info('Converting ligands to PDBQT.')
+    logger.info('Converting ligands to PDBQT')
     for ligand in os.listdir(ligands_dir):
         if not ligand.lower().endswith('.pdb'):
             continue
-        subprocess.Popen('prepare_ligand4.py -l {0} -o {1} -A hydrogens -U nphs -v'.format(
+        subprocess.Popen('{0} -l {1} -o {2} -A hydrogens -U nphs -v'.format(
+            os.path.join(app_dir, 'prepare_ligand4.py'),
             ligand,
             os.path.join(ligands_pdbqt_dir, ligand.replace('pdb', 'pdbqt').replace('.PDB', '.pdbqt'))
             ), shell=True, stdout=stdout).wait()
@@ -196,7 +213,8 @@ def dockit(verbose, reset):
     for target in os.listdir(targets_dir):
         if not target.lower().endswith('.pdb'):
             continue
-        subprocess.Popen('prepare_receptor4.py -r {0} -o {1} -A checkhydrogens -U nphs -v'.format(
+        subprocess.Popen('{0} -r {1} -o {2} -A checkhydrogens -U nphs -v'.format(
+            os.path.join(app_dir, 'prepare_receptor4.py'),
             target,
             os.path.join(targets_pdbqt_dir, target.replace('pdb', 'pdbqt').replace('.PDB', '.pdbqt'))
             ), shell=True, stdout=stdout).wait()
@@ -209,6 +227,11 @@ def dockit(verbose, reset):
     logger.debug('Reading dockit_param.csv')
     param_dir = os.path.join(root_dir, 'dockit_param.csv')
     param_dict = parse_param_csv(param_dir)
+
+    logger.debug('Checking if listed targets in param exist')
+    for index, row in param_dict.items():
+        if row['target'] not in [i.rstrip('.pdbqt') for i in os.listdir(targets_pdbqt_dir)]:
+            raise ValueError('{} does not exist'.format(row['target']))
 
     logger.info('Creating docking config files and initiating docking')
     for index, row in param_dict.items():
@@ -224,7 +247,7 @@ def dockit(verbose, reset):
                 os.makedirs(tar_result_dir)
 
             flex_resi = None
-            if row['flex_resi'] not in  ('0', '', 'None', ' '):
+            if row['flex_resi'] not in ('0', '', 'None', ' '):
                 logger.info('Creating flexible residue PDBQT')
                 try:
                     subprocess.Popen('{0} -r {1} -s {2} -g {3} -x {4} -v'.format(
@@ -277,9 +300,12 @@ if __name__ == "__main__":
     optional.add_argument('-v', '--verbose',
         help='Specify the flag to include verbose messages',
         action='store_true')
+    optional.add_argument('-m', '--minimize',
+        help='Energy minimize ligands using obminimize with default settings',
+        action='store_true')
     optional.add_argument('-r', '--reset',
         help='Restores input files to pre-run state preserving only input PDB files',
         action='store_true')
     args = parser.parse_args()
 
-    dockit(args.verbose, args.reset)
+    dockit(args.verbose, args.reset, args.minimize)

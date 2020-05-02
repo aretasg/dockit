@@ -7,3 +7,4 @@ services:
       - ./targets/PDB:/app/targets/PDB
       - ./dockit_param.csv:/app/dockit_param.csv
       - ./results:/app/results
+      - ./app/dockit.logs:/app/app/dockit.logs

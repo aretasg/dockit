@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Author: Aretas Gaspariunas
+
 import logging
 import os
 import shutil
@@ -7,6 +9,7 @@ import sys
 import argparse
 import subprocess
 import csv
+import threading
 
 from get_results import get_results
 
@@ -39,7 +42,7 @@ class AppLogger:
         return logger
 
 
-def pdb_parser(pdb_file):
+def parse_pdb(pdb_file):
 
     with open(os.path.abspath(pdb_file), 'r') as input_file:
         atom_count = 0
@@ -126,7 +129,7 @@ def reset_(path):
         raise e
 
 
-def dockit(verbose, reset, minimization):
+def dockit_vina(verbose, reset, minimization):
 
     path = os.path.dirname(os.path.realpath(__file__))
     logger = AppLogger.get(__name__, os.path.join(path, 'dockit.logs'),
@@ -166,15 +169,17 @@ def dockit(verbose, reset, minimization):
 
     logger.info('Checking input file formats')
     for protein in os.listdir(targets_dir):
-        if protein.lower().endswith('.pdb') and not pdb_parser(os.path.join(targets_dir, protein)):
+        if protein.lower().endswith('.pdb') and not parse_pdb(os.path.join(targets_dir, protein)):
             logger.error('File {0} not in PDB format'.format(protein))
             sys.exit()
     for ligand in os.listdir(ligands_dir):
-        if ligand.lower().endswith('.pdb') and not pdb_parser(os.path.join(ligands_dir,ligand)):
+        if ligand.lower().endswith('.pdb') and not parse_pdb(os.path.join(ligands_dir,ligand)):
             logger.error('File not in PDB format {0}'.format(ligand))
             sys.exit()
 
+    # NOTE: sometimes the prepare_ligand will fail if pwd is not ligand PDB folder
     os.chdir(ligands_dir)
+
     if minimization is True:
         logger.info('Minimizing ligands with obminimize')
         try:
@@ -185,8 +190,6 @@ def dockit(verbose, reset, minimization):
                 os.rename('min_'+ligand, ligand)
         except Exception as e:
             logger.error('Failed to minimize ligands')
-    else:
-        pass
 
     logger.debug('Creating ligand PDBQT dir')
     ligands_pdbqt_dir = os.path.join(root_dir, 'ligands', 'PDBQT')
@@ -228,7 +231,7 @@ def dockit(verbose, reset, minimization):
     param_dir = os.path.join(root_dir, 'dockit_param.csv')
     param_dict = parse_param_csv(param_dir)
 
-    logger.debug('Checking if listed targets in param exist')
+    logger.debug('Checking if targets in param file exist')
     for index, row in param_dict.items():
         if row['target'] not in [i.rstrip('.pdbqt') for i in os.listdir(targets_pdbqt_dir)]:
             raise ValueError('{} does not exist'.format(row['target']))
@@ -280,18 +283,36 @@ def dockit(verbose, reset, minimization):
                 os.path.join(tar_result_dir, engine + "_out_" + row['target'] + '-' + ligand.rstrip('.pdbqt'))
                 )
 
-            subprocess.Popen(vina_command, shell=True, stdout=stdout).wait()
+            def run_cmd(vina_command, shell, stdout):
+                subprocess.Popen(vina_command, shell=shell, stdout=stdout).wait()
 
-    logger.info('Parsing results and writting to csv')
+            # creating a thread
+            t = threading.Thread(target=run_cmd, args=(vina_command, True, stdout))
+            t.daemon = True
+            t.start()
+
+    # waiting for threads to finish
+    main_thread = threading.currentThread()
+    for t in threading.enumerate():
+        if t is main_thread:
+            continue
+        t.join()
+
+    logger.info('Parsing results and writting output as CSV')
     get_results()
+
+
+def dockit(verbose, reset, minimization):
+
+    dockit_vina(verbose, reset, minimization)
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description='''
-        AutoDock Vina wrapper for performing high-throughput molecular docking
-        with multiple targets and flexible residue support
+            Perform high-throughput molecular docking with multiple targets and
+            ligands using Vina-like engines
         ''',
         epilog='Usage in CLI: "python dockit.py"')
     parser._action_groups.pop()

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Author: Aretas Gaspariunas
+
 import os
 import re
 import sys

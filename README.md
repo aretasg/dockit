@@ -14,14 +14,14 @@ Perform high-throughput molecular docking with multiple targets and ligands usin
 ## Installation (Docker or Conda)
 ### Docker
 Dockit can be run with [Docker](https://docs.docker.com/get-docker/). You must have Docker & docker-compose installed
-```
+```bash
 git clone https://github.com/aretasg/dockit
 cd dockit
 ```
 
 ### Conda
 Install [conda](https://docs.conda.io/en/latest/miniconda.html) first
-```
+```bash
 git clone https://github.com/aretasg/dockit
 cd dockit
 conda env create -f environment.yml
@@ -32,11 +32,11 @@ conda activate dockit
 1. Determine the search box size and centre positioning using [Chimera](https://www.cgl.ucsf.edu/chimera/download.html) (Tools > Structure/Binding Analysis > Vina) or similar
 2. Define search box and docking parameters for each target in ```dockit_param.csv```
 3. Copy protein and ligand PDB files into ```targets/PDB``` and ```ligands/PDB``` folders, respectively and run:
-```
+```bash
 python app/dockit.py
 ```
 or if using Docker
-```
+```bash
 docker-compose up
 ```
 * The calculation will take some time depending on the parameters chosen and the number of files. Results can be found in the ```results``` folder
@@ -74,10 +74,13 @@ docker-compose up
 * The necessity of selecting the charges (Kollman/Gasteirger) is obsolete with Vina due to the scoring system being based on hydrophobic and hydrogen bond interactions compared to its predecessor AutoDock 4. Nevertheless, the default charge for targets and ligands are set as Kollman and Gasteirger, respectively
 
 ## Authors
-**Aretas Gaspariunas**
+Written by Aretas Gaspariunas. Have a question? You can always ask and I can always ignore.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Acknowledgments & Disclaimer
-prepare_ligand4.py, prepare_receptor4.py and repare_flexreceptor4.py are distributed as part of MGLTools 1.5.6 and all the ownership together with AutoDock Vina is credited to their respective authors (Morris et al., 2009)
+## Citing
+If you found Dockit useful for your work please acknowledge it by citing the repository
+
+## Acknowledgments & Disclaimer
+```prepare_ligand4.py```, ```prepare_receptor4.py``` and ```repare_flexreceptor4.py``` are distributed as part of MGLTools 1.5.6 and all the ownership together with AutoDock Vina is credited to their respective authors (Morris et al., 2009)

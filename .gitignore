@@ -6,3 +6,4 @@ targets/PDB/*.pdb
 results
 app/*.logs
 app/*.pyc
+app/__pycache__

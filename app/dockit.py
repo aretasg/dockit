@@ -71,14 +71,24 @@ def parse_param_csv(param_dir):
                 param_dict[line_count] = {header[i]: row[i] for i in range(len(header))}
                 line_count += 1
 
-    for key, value in param_dict.items():
-        if key in ('target', 'x_center', 'y_center', 'z_center', 'size_x', 'size_y', 'size_z') and value == '':
-            raise ValueError('Missing one or more arguments in dockit_param.csv')
+    for line, param in param_dict.items():
+        for param_name, param_value in param.items():
+            if param_name in ('target', 'x_center', 'y_center', 'z_center', 'size_x', 'size_y', 'size_z') and param_value == '':
+                raise ValueError('Missing one or more arguments in dockit_param.csv')
 
     return param_dict
 
 
-def vina_config(config_dir, targets_pdbqt_dir, ligands_pdbqt_dir, results_dir, ligand, row, engine, flex_resi=None):
+def vina_config(
+    config_dir,
+    targets_pdbqt_dir,
+    ligands_pdbqt_dir,
+    results_dir,
+    ligand,
+    row,
+    engine,
+    flex_resi=None
+    ):
 
     with open(config_dir, 'w') as vina_config:
         vina_config.write("receptor = {0}\n".format(os.path.join(targets_pdbqt_dir, row['target'] + '.pdbqt')))
@@ -129,72 +139,15 @@ def reset_(path):
         raise e
 
 
-def dockit_vina(verbose, reset, minimization):
-
-    path = os.path.dirname(os.path.realpath(__file__))
-    logger = AppLogger.get(__name__, os.path.join(path, 'dockit.logs'),
-        stream_level=logging.INFO)
-
-    app_dir = os.path.dirname(os.path.abspath(__file__))
-    root_dir, app = os.path.split(app_dir)
-
-    if verbose:
-        stdout = None
-        logger.info('Verbose=True. Set to False to silence console messages')
-    else:
-        stdout = open(os.devnull, 'w')
-
-    if reset:
-        logger.info('Resetting to pre-run state')
-        reset_(root_dir)
-        sys.exit()
-
-    logger.info('Creating ligands and targets directories')
-    ligands_dir = os.path.join(root_dir, 'ligands', 'PDB')
-    if not os.path.exists(ligands_dir):
-        os.makedirs(ligands_dir)
-
-    targets_dir = os.path.join(root_dir, 'targets', 'PDB')
-    if not os.path.exists(targets_dir):
-        os.makedirs(targets_dir)
-
-    logger.info('Checking for files in targets and ligands folders')
-    if len([protein for protein in os.listdir(targets_dir) if protein.lower().endswith('.pdb')]) == 0:
-        logger.error('Failed to find PDB files in {0} directory'.format(targets_dir))
-        sys.exit()
-
-    if len([ligand for ligand in os.listdir(ligands_dir) if ligand.lower().endswith('.pdb')]) == 0:
-        logger.error('Failed to find PDB files in {0} directory'.format(ligands_dir))
-        sys.exit()
-
-    logger.info('Checking input file formats')
-    for protein in os.listdir(targets_dir):
-        if protein.lower().endswith('.pdb') and not parse_pdb(os.path.join(targets_dir, protein)):
-            logger.error('File {0} not in PDB format'.format(protein))
-            sys.exit()
-    for ligand in os.listdir(ligands_dir):
-        if ligand.lower().endswith('.pdb') and not parse_pdb(os.path.join(ligands_dir,ligand)):
-            logger.error('File not in PDB format {0}'.format(ligand))
-            sys.exit()
-
-    # NOTE: sometimes the prepare_ligand will fail if pwd is not ligand PDB folder
-    os.chdir(ligands_dir)
-
-    if minimization is True:
-        logger.info('Minimizing ligands with obminimize')
-        try:
-            for ligand in os.listdir(ligands_dir):
-                subprocess.Popen('obminimize -o pdb {0} > min_{0}'.format(ligand),
-                    shell=True, stdout=stdout).wait()
-                os.remove(ligand)
-                os.rename('min_'+ligand, ligand)
-        except Exception as e:
-            logger.error('Failed to minimize ligands')
+def dockit_vina(param_dict, root_dir, app_dir, ligands_dir, targets_dir, stdout, logger):
 
     logger.debug('Creating ligand PDBQT dir')
     ligands_pdbqt_dir = os.path.join(root_dir, 'ligands', 'PDBQT')
     if not os.path.exists(ligands_pdbqt_dir):
         os.makedirs(ligands_pdbqt_dir)
+
+    # NOTE: sometimes the prepare_ligand will fail if pwd is not ligand PDB folder
+    os.chdir(ligands_dir)
 
     logger.info('Converting ligands to PDBQT')
     for ligand in os.listdir(ligands_dir):
@@ -222,19 +175,15 @@ def dockit_vina(verbose, reset, minimization):
             os.path.join(targets_pdbqt_dir, target.replace('pdb', 'pdbqt').replace('.PDB', '.pdbqt'))
             ), shell=True, stdout=stdout).wait()
 
+    logger.debug('Checking if targets in param file exist in targets dir')
+    for index, row in param_dict.items():
+        if row['target'] not in [i.rstrip('.pdbqt') for i in os.listdir(targets_pdbqt_dir)]:
+            raise ValueError('{} does not exist'.format(row['target']))
+
     logger.debug('Creating results folder')
     results_dir = os.path.join(root_dir, 'results')
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
-
-    logger.debug('Reading dockit_param.csv')
-    param_dir = os.path.join(root_dir, 'dockit_param.csv')
-    param_dict = parse_param_csv(param_dir)
-
-    logger.debug('Checking if targets in param file exist')
-    for index, row in param_dict.items():
-        if row['target'] not in [i.rstrip('.pdbqt') for i in os.listdir(targets_pdbqt_dir)]:
-            raise ValueError('{} does not exist'.format(row['target']))
 
     logger.info('Creating docking config files and initiating docking')
     for index, row in param_dict.items():
@@ -298,13 +247,75 @@ def dockit_vina(verbose, reset, minimization):
             continue
         t.join()
 
-    logger.info('Parsing results and writting output as CSV')
-    get_results()
-
 
 def dockit(verbose, reset, minimization):
 
-    dockit_vina(verbose, reset, minimization)
+    path = os.path.dirname(os.path.realpath(__file__))
+    logger = AppLogger.get(__name__, os.path.join(path, 'dockit.logs'),
+        stream_level=logging.INFO)
+
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir, app = os.path.split(app_dir)
+
+    if verbose:
+        stdout = None
+        logger.info('Verbose=True. Set to False to silence console messages')
+    else:
+        stdout = open(os.devnull, 'w')
+
+    if reset:
+        logger.info('Resetting to pre-run state')
+        reset_(root_dir)
+        sys.exit()
+
+    logger.debug('Reading dockit_param.csv')
+    param_dir = os.path.join(root_dir, 'dockit_param.csv')
+    param_dict = parse_param_csv(param_dir)
+
+    logger.info('Creating ligands directory')
+    ligands_dir = os.path.join(root_dir, 'ligands', 'PDB')
+    if not os.path.exists(ligands_dir):
+        os.makedirs(ligands_dir)
+
+    logger.info('Creating targets directory')
+    targets_dir = os.path.join(root_dir, 'targets', 'PDB')
+    if not os.path.exists(targets_dir):
+        os.makedirs(targets_dir)
+
+    logger.info('Checking for PDB files in targets and ligands folders')
+    if len([protein for protein in os.listdir(targets_dir) if protein.lower().endswith('.pdb')]) == 0:
+        logger.error('Failed to find PDB files in {0} directory'.format(targets_dir))
+        sys.exit()
+
+    if len([ligand for ligand in os.listdir(ligands_dir) if ligand.lower().endswith('.pdb')]) == 0:
+        logger.error('Failed to find PDB files in {0} directory'.format(ligands_dir))
+        sys.exit()
+
+    logger.info('Checking input files are in PDB format')
+    for protein in os.listdir(targets_dir):
+        if protein.lower().endswith('.pdb') and not parse_pdb(os.path.join(targets_dir, protein)):
+            logger.error('File {0} not in PDB format'.format(protein))
+            sys.exit()
+    for ligand in os.listdir(ligands_dir):
+        if ligand.lower().endswith('.pdb') and not parse_pdb(os.path.join(ligands_dir,ligand)):
+            logger.error('File not in PDB format {0}'.format(ligand))
+            sys.exit()
+
+    if minimization is True:
+        logger.info('Minimizing ligands with obminimize')
+        try:
+            for ligand in os.listdir(ligands_dir):
+                subprocess.Popen('obminimize -o pdb {0} > min_{0}'.format(ligand),
+                    shell=True, stdout=stdout).wait()
+                os.remove(ligand)
+                os.rename('min_'+ligand, ligand)
+        except Exception as e:
+            logger.error('Failed to minimize ligands')
+
+    dockit_vina(param_dict, root_dir, app_dir, ligands_dir, targets_dir, stdout, logger)
+
+    logger.info('Parsing results and writting output as CSV')
+    get_results()
 
 
 if __name__ == "__main__":

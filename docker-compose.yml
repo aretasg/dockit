@@ -3,8 +3,8 @@ services:
   dockit:
     build: .
     volumes:
-      - ./ligands/PDB:/app/ligands/PDB
-      - ./targets/PDB:/app/targets/PDB
-      - ./dockit_param.csv:/app/dockit_param.csv
-      - ./results:/app/results
-      - ./app/dockit.logs:/app/app/dockit.logs
+      - ./ligands/PDB:/ligands/PDB
+      - ./targets/PDB:/targets/PDB
+      - ./dockit_param.csv:/dockit_param.csv
+      - ./results:/results
+      - ./app/dockit.logs:/app/dockit.logs

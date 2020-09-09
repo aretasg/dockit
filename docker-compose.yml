@@ -5,6 +5,11 @@ services:
     volumes:
       - ./ligands/PDB:/ligands/PDB
       - ./targets/PDB:/targets/PDB
+      - ./ligands/PDBQT:/ligands/PDBQT
+      - ./targets/PDBQT:/targets/PDBQT
       - ./dockit_param.csv:/dockit_param.csv
       - ./results:/results
-      - ./app/dockit.logs:/app/dockit.logs
+      - ./error.log:/error.log
+      - ./info.log:/info.log
+    environment:
+      - PYTHONUNBUFFERED=1

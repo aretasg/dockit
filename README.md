@@ -1,19 +1,20 @@
 # Dockit
 
-Perform high-throughput molecular docking with multiple targets and ligands using Vina-like engines
+Perform high-throughput molecular docking with multiple targets and ligands using AutoDock Vina series engines.
 
-## Features
-* Molecular docking with multiple target and ligands at the same time
-* Flexible residue declaration for targets
-* Use other Vina-like engines e.g. [Qvina2/Qvina-W](https://qvina.github.io) or [Smina](https://github.com/mwojcikowski/smina)
-* Optional ligand energy minimization using [obminimize](https://openbabel.org/wiki/Obminimize)
-* Output CSV file with all docking results for all modes for an easy access to the docking results
-* Original PDBQT preparation method, as distributed with MGLTools
+## :gem: Features
+* Molecular docking with multiple target and ligands at the same time.
+* Flexible residue declaration for targets.
+* Use other Vina-like engines e.g. [Qvina2/Qvina-W](https://qvina.github.io) or [Smina](https://github.com/mwojcikowski/smina).
+* Original PDBQT preparation method as distributed with MGLTools.
+* Automated PDBQT file preparation.
+* Optional ligand energy minimization using [obminimize](https://openbabel.org/wiki/Obminimize).
+* Output CSV file with all docking results for all modes for an easy access to the docking results.
 * Docker support. Run it anywhere!
 
-## Installation (Docker or Conda)
+## :rocket: Installation (Docker or Conda)
 ### Docker
-Dockit can be run with [Docker](https://docs.docker.com/get-docker/). You must have Docker & docker-compose installed
+Dockit can be run with [Docker](https://docs.docker.com/get-docker/). You must have Docker & docker-compose installed.
 ```bash
 git clone https://github.com/aretasg/dockit
 cd dockit
@@ -28,10 +29,10 @@ conda env create -f environment.yml
 conda activate dockit
 ```
 
-## Example usage
-1. Determine the search box size and centre positioning using [Chimera](https://www.cgl.ucsf.edu/chimera/download.html) (Tools > Structure/Binding Analysis > Vina) or similar
-2. Define search box and docking parameters for each target in ```dockit_param.csv```
-3. Copy protein and ligand PDB files into ```targets/PDB``` and ```ligands/PDB``` folders, respectively and run:
+## :computer: Example usage
+1. Determine the search box size and centre positioning using [Chimera](https://www.cgl.ucsf.edu/chimera/download.html) (Tools > Structure/Binding Analysis > Vina) or similar.
+2. Define search box and docking parameters for each target in `dockit_param.csv`.
+3. Copy protein and ligand PDB files into `targets/PDB` and `ligands/PDB` folders, respectively and run:
 ```bash
 python app/dockit.py
 ```
@@ -39,10 +40,10 @@ or if using Docker
 ```bash
 docker-compose up
 ```
-* The calculation will take some time depending on the parameters chosen and the number of files. Results can be found in the ```results``` folder
-* Visualise the ```results``` with a molecular viewer of your choice by loading ligand PDBQT file in the ```results``` folder and target PDB or PDBQT file in ```targets``` directory
-* CSV file ```dockit_results.csv``` is generated in ```results``` folder with all the docking results
-* Run with ```-r``` flag to reset to the pre-run state - PDBQT and result files will be removed
+* The calculation will take some time depending on the parameters and the number of files. Results can be found in the `results` folder.
+* Visualise the `results` with a molecular viewer of your choice by loading ligand PDBQT file in the `results` folder and target PDB or PDBQT file in `targets` directory.
+* CSV file `dockit_results.csv` is generated in `results` folder with all the docking results.
+* Run with `-r` flag to reset to the pre-run state - PDBQT and result files will be removed.
 
 ## Argument description in dockit_param.csv
 | Argument | Description | Required |
@@ -63,24 +64,24 @@ docker-compose up
 | `flex_resi` | specify target residues to be treaded as flexible during docking | 🤔 |
 
 ## FAQ
-* Dockit will dock every target against every ligand in ```targets/PDB``` and ```ligands/PDB```, respectively.
-* Dockit is not an input for docking preparation tool. Input files have to be in PDB format. Conversion to PDBQT adds hydrogens and removes non-polar ones
-* Edit ```dockit_param.csv``` to change any parameters to be run with the docking engine, including search box parameters
-* Run with ```-m``` flag perform energy minimization using obminimize with default settings
-* Supports declaration of flexible residues for targets. Please look at ```dockit_param.csv``` for an example for how to declare flexible residues
-* Supports other Vina-like engines e.g. Qvina2. Please specify the engine name or path to it in the ```engine``` column of ```dockit_param.csv```. Dockit comes installed with ```vina```, ```qvina2```, ```qvinaw``` and ```smina```. You should be able to use any other engine with the same CLI as Vina
-* Specify custom scoring system weights in the ```weight_*``` fields of ```dockit_param.csv```. More about the scoring system [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3041641/#!po=22.7273)
-* Dockit utilises threading to distribute multiple simulations across available cores. Please change the ```cpu``` argument to a finite value to ensure distributed processing
-* The necessity of selecting the charges (Kollman/Gasteirger) is obsolete with Vina due to the scoring system being based on hydrophobic and hydrogen bond interactions compared to its predecessor AutoDock 4. Nevertheless, the default charge for targets and ligands are set as Kollman and Gasteirger, respectively
+* Dockit will dock every target against every ligand in `targets/PDB` and `ligands/PDB`, respectively.
+* Dockit is not an input for docking preparation tool. Input files have to be in PDB format. Conversion to PDBQT adds hydrogens and removes non-polar ones.
+* Edit `dockit_param.csv` to change any parameters to be run with the docking engine, including search box parameters.
+* Run with `-m` flag perform energy minimization for ligands using `obminimize` with default settings.
+* Supports declaration of flexible residues for targets. Please look at `dockit_param.csv` for an example for how to declare flexible residues.
+* Supports other Vina-like engines e.g. Qvina2. Please specify the engine name or path to it in the `engine` column of `dockit_param.csv`. Dockit comes installed with `vina`, `qvina2`, `qvinaw` and `smina`. You should be able to use any other engine with the same CLI as Vina.
+* Specify custom scoring system weights in the `weight_*` fields of `dockit_param.csv`. More about the scoring system [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3041641/#!po=22.7273).
+* Dockit utilises threading to distribute multiple simulations across available cores. Please change the `cpu` argument to a finite value to ensure distributed processing.
+* The necessity of selecting the charges (Kollman/Gasteirger) is obsolete with Vina due to the scoring system being based on hydrophobic and hydrogen bond interactions compared to its predecessor AutoDock 4. Nevertheless, the default charge for targets and ligands are set as Kollman and Gasteirger, respectively.
 
-## Authors
-Written by Aretas Gaspariunas. Have a question? You can always ask and I can always ignore.
+## :pencil2: Authors
+Written by **Aretas Gaspariunas**. Have a question? You can always ask and I can always ignore.
+
+## :apple: Citing
+If you found Dockit useful for your work please acknowledge it by citing this repository.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Citing
-If you found Dockit useful for your work please acknowledge it by citing the repository
+MIT License.
 
 ## Acknowledgments & Disclaimer
-```prepare_ligand4.py```, ```prepare_receptor4.py``` and ```repare_flexreceptor4.py``` are distributed as part of MGLTools 1.5.6 and all the ownership together with AutoDock Vina is credited to their respective authors (Morris et al., 2009)
+`prepare_*` files are distributed as part of MGLTools 1.5.6 and all the ownership is credited to their respective authors (Morris et al., 2009).
